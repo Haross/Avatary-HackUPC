@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script
+			src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js'></script>
+	<script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Karla:400,700&amp;display=swap" rel="stylesheet">
+	<style>
+  html{
+    background-image: url(https://images.typeform.com/images/BUSuv6xa7kKR);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+  }
+		img{
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			border-radius: 50%;
+			border-color: white;
+      background-color: white;
+			border-width: 2px;
+			border-style: double;
+      animation: float 6s ease-in-out infinite;
+
+		}
+    @keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		transform: translatey(-20px);
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+}
+
+		h1{
+			color:white;
+		}
+		*{
+			font-family: 'Karla', sans-serif;
+		}
+		div.h1{
+			text-align: center;
+		}
+	</style>
+
+</head>
+<body >
+<br><br><br><br>
+<div id="text1"  class="" style="width:100%;text-align:center;font-weight: unset;font-size: 44px;line-height: 32px;color:white;">
+	<!-- <h1 style="text-align:center;font-weight: unset;font-size: 24px;line-height: 32px;">Based on your selections, here is your avatar</h1> -->
+</div>
+<br><br><br><br>
+<div id="pic"style="width: 100%; height: 80%;"></div>
+<br><br>
+<div class=""  style="width:100%;color:white;text-align: center;font-weight: unset;font-size: 34px;line-height: 32px;" id="keywords">
+
+</div>
+
+</body>
+</html>
+
+
+<script>
+	$(function() {
+$("#pic").hide();
+$("#keywords").hide();
+		var id = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+		console.log(id);
+
+		var options = 0;
+		$.ajax({
+			url: 'https://cors-anywhere.herokuapp.com/https://api.typeform.com/forms/d0D8at/responses',
+			type: 'GET',
+			crossDomain: true,
+			headers: {'Authorization': 'Bearer 2KfHy9EAeiXvypJs3GF1CCZDdBDcpYz5P1a8GyDTfBJR',"x-requested-with": "xhr" },
+			contentType: false,
+			processData: false
+		}).done(function(data) {
+			console.log(data);
+			var app = document.getElementById('text1');
+      var app2 = document.getElementById('keywords');
+
+			var typewriter = new Typewriter(app, {
+				loop: false
+			});
+      var typewriter2 = new Typewriter(app2, {
+				loop: false
+			});
+
+			typewriter.typeString('Hello!')
+					.pauseFor(700)
+					.deleteAll()
+					.typeString('Based on your selection, here is your avatar')
+          .pauseFor(500)
+          .callFunction(() => {
+            $("#pic").show("fade",500);
+            $("#keywords").show(500);
+          }).pauseFor(500)
+          .callFunction(()=>{
+            typewriter2.typeString('Your avatar characteristics: ')
+                .pauseFor(700)
+                .typeString(keywords)
+                .pauseFor(500)
+                .start();
+          })
+					.start();
+
+			//jsonResponse = JSON.parse(data);
+			var urlPic = "https://robohash.org/";
+			var userdata;
+			var keywords = "";
+			var flag = false;
+			//var i;
+			for (var item in data.items) {
+				for(var k in data.items[item].answers){
+					if(data.items[item].answers[k].field.ref == "question1"){
+						if(data.items[item].answers[k].text == id){
+							userdata =data.items[item];
+							break;
+						}
+
+					}
+				}
+			}
+
+			for(var j in userdata.answers){
+				if(userdata.answers[j].field.ref == "question2"){
+					switch (userdata.answers[j].choice.label) {
+						case "Not able to vote":
+							urlPic+="baby%20";
+							keywords+= "baby";
+							break;
+						case "Eligible for a driving licence":
+							urlPic+="regular%20";
+							keywords+= "regular";
+							break;
+						case "Free rides in public transportation":
+							urlPic+="senior%20";
+							keywords+= "senior";
+							break;
+						default:
+							break;
+
+					}
+				}
+				if(userdata.answers[j].field.ref == "question3"){
+					urlPic+=userdata.answers[j].choice.label+"%20";
+					keywords+= ", "+userdata.answers[j].choice.label.toLowerCase();
+				}
+				if(userdata.answers[j].field.ref == "question4"){
+					switch (userdata.answers[j].choice.label) {
+						case "Once a week":
+							urlPic+="dirty%20";
+							keywords+=", dirty";
+							break;
+						case "2-3":
+							urlPic+="clean%20";
+							keywords+=", clean";
+							break;
+						case "4-5":
+							urlPic+="clean%20";
+							keywords+=", clean";
+							break;
+						case "Almost every day":
+							keywords+=", wet";
+							urlPic+="wet%20";
+							break;
+						default:
+							break;
+
+					}
+				}
+				if(userdata.answers[j].field.ref == "question6"){
+					//Cat
+					if(userdata.answers[j].choice.label == "Cat"){
+						keywords+=", cat";
+						options ="?set=set4";
+					}else{
+						urlPic+="loyal%20";
+						keywords+=", loyal";}
+				}
+
+				if(userdata.answers[j].field.ref == "question7"){
+					if(userdata.answers[j].boolean == "Yes"){
+						options ="?set=set2";
+					keywords+=", alien";}
+				}
+				if(userdata.answers[j].field.ref == "question8"){
+					if(userdata.answers[j].choice.label == "Living as a slave in an alien colony"){
+						urlPic+="slave%20";keywords+=", slave";
+					}  else{
+						urlPic+="fighter%20";keywords+=", fighter";}
+				}
+			}
+
+			urlPic+= options;
+			$('#pic').empty().append('<img src="'+urlPic+'" height="30%" width="33%">');
+			// $('#keywords').text("Your avatar characteristics: "+keywords)
+
+		}).fail(function(err) {
+			alert("error "+JSON.stringify(err));
+		});
+
+	})
+
+</script>
